@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { storeToRefs } from "pinia";
 import DashboardLayout from "@/components/layout/DashboardLayout.vue";
 import CardPanel from "@/components/ui/CardPanel.vue";
 import StatCard from "@/components/ui/StatCard.vue";
@@ -16,9 +17,11 @@ import {
   monthlySeries,
   netWorthSeries,
   palette,
-  transactions,
   weekdaySpending,
 } from "@/data/mock";
+import { useTransactionsStore } from "@/stores/transactions";
+
+const { items: transactions } = storeToRefs(useTransactionsStore());
 
 const monthLabels = monthlySeries.map((point) => point.label);
 const months = monthlySeries.length || 1;
@@ -53,7 +56,7 @@ const maxWeekday = computed(() =>
 
 const topMerchants = computed(() => {
   const totals = new Map<string, { total: number; category: string }>();
-  for (const txn of transactions) {
+  for (const txn of transactions.value) {
     if (txn.type !== "expense") continue;
     const existing = totals.get(txn.merchant);
     totals.set(txn.merchant, {
@@ -121,12 +124,18 @@ const asCurrency = (value: number) => formatCurrency(value, false);
     <div class="mt-4 grid gap-4 xl:grid-cols-3">
       <CardPanel class="xl:col-span-2" title="Income vs. expenses" subtitle="By month">
         <template #actions>
-          <span class="inline-flex items-center gap-1.5 text-xs text-zinc-500">
-            <span class="size-2 rounded-sm" :style="{ backgroundColor: palette.green }" />
+          <span class="inline-flex items-center gap-1.5 text-xs text-zinc-400">
+            <span
+              class="size-2 rounded-sm"
+              :style="{ backgroundColor: palette.green, boxShadow: `0 0 6px ${palette.green}aa` }"
+            />
             Income
           </span>
-          <span class="inline-flex items-center gap-1.5 text-xs text-zinc-500">
-            <span class="size-2 rounded-sm" :style="{ backgroundColor: palette.brick }" />
+          <span class="inline-flex items-center gap-1.5 text-xs text-zinc-400">
+            <span
+              class="size-2 rounded-sm"
+              :style="{ backgroundColor: palette.brick, boxShadow: `0 0 6px ${palette.brick}aa` }"
+            />
             Expenses
           </span>
         </template>
@@ -137,11 +146,11 @@ const asCurrency = (value: number) => formatCurrency(value, false);
       <CardPanel title="Highlights" subtitle="Twelve-month view">
         <ul class="space-y-4">
           <li class="flex gap-3">
-            <span class="grid size-7 shrink-0 place-items-center rounded-md bg-zinc-100 text-zinc-500">
+            <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/25">
               <AppIcon name="trending-up" :size="14" />
             </span>
             <div class="min-w-0">
-              <p class="text-sm font-medium text-zinc-900">
+              <p class="text-sm font-medium text-zinc-100">
                 Best month: {{ bestSavingMonth.label }}
               </p>
               <p class="mt-0.5 text-xs text-zinc-500">
@@ -153,11 +162,11 @@ const asCurrency = (value: number) => formatCurrency(value, false);
           </li>
 
           <li class="flex gap-3">
-            <span class="grid size-7 shrink-0 place-items-center rounded-md bg-zinc-100 text-zinc-500">
+            <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-amber-500/10 text-amber-300 ring-1 ring-inset ring-amber-500/25">
               <AppIcon name="calendar" :size="14" />
             </span>
             <div class="min-w-0">
-              <p class="text-sm font-medium text-zinc-900">{{ busiestDay.label }} is your peak</p>
+              <p class="text-sm font-medium text-zinc-100">{{ busiestDay.label }} is your peak</p>
               <p class="mt-0.5 text-xs text-zinc-500">
                 Averaging {{ formatCurrency(busiestDay.value, false) }} per day.
               </p>
@@ -165,11 +174,11 @@ const asCurrency = (value: number) => formatCurrency(value, false);
           </li>
 
           <li class="flex gap-3">
-            <span class="grid size-7 shrink-0 place-items-center rounded-md bg-zinc-100 text-zinc-500">
+            <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-white/5 text-zinc-300 ring-1 ring-inset ring-white/10">
               <AppIcon name="coins" :size="14" />
             </span>
             <div class="min-w-0">
-              <p class="text-sm font-medium text-zinc-900">
+              <p class="text-sm font-medium text-zinc-100">
                 Net worth up {{ formatPercent(netWorthGrowth) }}
               </p>
               <p class="mt-0.5 text-xs text-zinc-500">Across the last twelve months.</p>
@@ -185,19 +194,21 @@ const asCurrency = (value: number) => formatCurrency(value, false);
           <li
             v-for="(merchant, index) in topMerchants"
             :key="merchant.merchant"
-            class="-mx-2 flex items-center gap-3 rounded-md px-2 py-3 transition-colors hover:bg-zinc-50"
+            class="-mx-2 flex items-center gap-3 rounded-lg px-2 py-3 transition-colors hover:bg-white/[0.03]"
           >
-            <span class="w-3 shrink-0 text-xs text-zinc-400 tabular-nums">{{ index + 1 }}</span>
+            <span class="w-4 shrink-0 text-xs font-semibold text-zinc-600 tabular-nums">
+              {{ (index + 1).toString().padStart(2, '0') }}
+            </span>
             <IconTile
               :icon="categoryIcon(merchant.category)"
               :color="categoryColor(merchant.category)"
               :size="36"
             />
             <div class="min-w-0 flex-1">
-              <p class="truncate text-sm font-medium text-zinc-900">{{ merchant.merchant }}</p>
+              <p class="truncate text-sm font-medium text-zinc-100">{{ merchant.merchant }}</p>
               <p class="truncate text-xs text-zinc-500">{{ merchant.category }}</p>
             </div>
-            <span class="shrink-0 text-sm font-medium text-zinc-900 tabular-nums">
+            <span class="shrink-0 text-sm font-medium text-zinc-100 tabular-nums">
               {{ formatCurrency(merchant.total) }}
             </span>
           </li>
@@ -209,11 +220,11 @@ const asCurrency = (value: number) => formatCurrency(value, false);
         title="Spending by weekday"
         subtitle="Averaged across September"
       >
-        <ul class="space-y-3.5">
+        <ul class="space-y-4">
           <li v-for="day in weekdaySpending" :key="day.label">
             <div class="mb-1.5 flex items-center justify-between gap-3">
-              <span class="text-sm text-zinc-600">{{ day.label }}</span>
-              <span class="text-sm text-zinc-900 tabular-nums">
+              <span class="text-sm text-zinc-300">{{ day.label }}</span>
+              <span class="text-sm text-zinc-100 tabular-nums">
                 {{ formatCurrency(day.value, false) }}
               </span>
             </div>
@@ -233,7 +244,7 @@ const asCurrency = (value: number) => formatCurrency(value, false);
       <CardPanel class="xl:col-span-2" title="Net worth trend" subtitle="Twelve-month trajectory">
         <template #actions>
           <span
-            class="inline-flex items-center rounded bg-emerald-50 px-1.5 py-0.5 text-xs font-medium text-emerald-700 tabular-nums ring-1 ring-emerald-600/20 ring-inset"
+            class="inline-flex items-center rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-xs font-medium text-emerald-400 tabular-nums ring-1 ring-emerald-500/25 ring-inset"
           >
             +{{ formatPercent(netWorthGrowth) }}
           </span>
@@ -249,11 +260,11 @@ const asCurrency = (value: number) => formatCurrency(value, false);
       </CardPanel>
 
       <CardPanel title="Category totals" subtitle="September 2026">
-        <ul class="space-y-3.5">
+        <ul class="space-y-4">
           <li v-for="slice in categoryBreakdown" :key="slice.label">
             <div class="mb-1.5 flex items-center justify-between gap-3">
-              <span class="truncate text-sm text-zinc-600">{{ slice.label }}</span>
-              <span class="shrink-0 text-sm text-zinc-900 tabular-nums">
+              <span class="truncate text-sm text-zinc-300">{{ slice.label }}</span>
+              <span class="shrink-0 text-sm text-zinc-100 tabular-nums">
                 {{ formatCurrency(slice.value, false) }}
               </span>
             </div>

@@ -10,32 +10,33 @@ const props = withDefaults(
     variant?: Variant;
     size?: Size;
     block?: boolean;
-    /** Native button type. Ignored when `to` is set. */
     type?: "button" | "submit" | "reset";
-    /** When set, renders a RouterLink styled as a button instead of a `<button>`. */
     to?: string;
   }>(),
   { variant: "outline", size: "md", block: false, type: "button" },
 );
 
 const variants: Record<Variant, string> = {
-  primary: "bg-zinc-900 text-white shadow-card hover:bg-zinc-800 active:bg-zinc-950",
-  accent: "bg-accent text-white shadow-card hover:bg-accent-hover active:bg-accent-hover",
+  primary:
+    "glow-emerald bg-emerald-500 text-zinc-950 hover:bg-emerald-400 active:bg-emerald-600",
+  accent:
+    "glow-emerald bg-emerald-500 text-zinc-950 hover:bg-emerald-400 active:bg-emerald-600",
   outline:
-    "border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 active:bg-zinc-100",
-  ghost: "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 active:bg-zinc-200",
-  subtle: "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 active:bg-zinc-300",
+    "border border-white/10 bg-white/[0.03] text-zinc-200 hover:bg-white/[0.07] hover:text-white hover:border-white/15 active:bg-white/[0.09]",
+  ghost:
+    "text-zinc-400 hover:bg-white/5 hover:text-zinc-100 active:bg-white/10",
+  subtle:
+    "bg-white/5 text-zinc-200 hover:bg-white/10 active:bg-white/[0.14]",
 };
 
 const sizes: Record<Size, string> = {
   sm: "h-8 gap-1.5 px-2.5 text-xs",
-  md: "h-9 gap-1.5 px-3 text-sm",
+  md: "h-9 gap-1.5 px-3.5 text-sm",
 };
 
 const base =
-  "focus-ring inline-flex cursor-pointer items-center justify-center rounded-md font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50";
+  "focus-ring inline-flex cursor-pointer items-center justify-center rounded-lg font-medium tracking-tight transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50";
 
-// Two root nodes, so listeners don't fall through — both roots forward explicitly.
 const emit = defineEmits<{ click: [event: MouseEvent] }>();
 
 const classes = computed(() => [

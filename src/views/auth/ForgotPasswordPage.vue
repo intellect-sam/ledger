@@ -46,12 +46,18 @@ const panelPoints = [
     </form>
 
     <div v-else>
-      <div class="rounded-md border border-zinc-200 bg-zinc-50 p-4">
-        <p class="flex items-center gap-2 text-sm font-medium text-zinc-900">
-          <AppIcon name="mail" :size="15" class="text-zinc-400" />
+      <div
+        class="relative overflow-hidden rounded-xl border border-emerald-500/20 bg-emerald-500/[0.05] p-4"
+      >
+        <div
+          class="pointer-events-none absolute -top-10 -right-10 h-24 w-24 rounded-full bg-emerald-500/15 blur-2xl"
+          aria-hidden="true"
+        />
+        <p class="relative flex items-center gap-2 text-sm font-medium text-zinc-100">
+          <AppIcon name="mail" :size="15" class="text-emerald-400" />
           Reset link sent
         </p>
-        <p class="mt-1.5 text-xs leading-relaxed text-zinc-600">
+        <p class="relative mt-1.5 text-xs leading-relaxed text-zinc-400">
           It can take a minute to arrive. If it hasn't, check your spam folder before sending
           another.
         </p>
@@ -66,7 +72,7 @@ const panelPoints = [
       Remembered it?
       <RouterLink
         to="/login"
-        class="font-medium text-accent transition-colors hover:text-accent-hover"
+        class="font-medium text-emerald-400 transition-colors hover:text-emerald-300"
       >
         Back to sign in
       </RouterLink>

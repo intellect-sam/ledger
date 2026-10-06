@@ -11,12 +11,12 @@ const props = withDefaults(
     formatTick?: (value: number) => string;
     interactive?: boolean;
   }>(),
-  { color: "#2f6690", height: 220, interactive: true },
+  { color: "#34d399", height: 220, interactive: true },
 );
 
 const W = 720;
-const PAD_LEFT = 46;
-const PAD_RIGHT = 8;
+const PAD_LEFT = 50;
+const PAD_RIGHT = 10;
 
 const uid = useId();
 const gradientId = `area-grad-${uid.replace(/[^a-zA-Z0-9-_]/g, "")}`;
@@ -170,8 +170,9 @@ function onLeave() {
     >
       <defs>
         <linearGradient :id="gradientId" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" :stop-color="color" stop-opacity="0.16" />
-          <stop offset="100%" :stop-color="color" stop-opacity="0.01" />
+          <stop offset="0%" :stop-color="color" stop-opacity="0.35" />
+          <stop offset="50%" :stop-color="color" stop-opacity="0.12" />
+          <stop offset="100%" :stop-color="color" stop-opacity="0" />
         </linearGradient>
       </defs>
 
@@ -183,8 +184,9 @@ function onLeave() {
           :x2="W - PAD_RIGHT"
           :y1="tick.y"
           :y2="tick.y"
-          stroke="#eeeef1"
+          stroke="rgba(255,255,255,0.05)"
           stroke-width="1"
+          stroke-dasharray="2 4"
         />
       </g>
 
@@ -195,7 +197,7 @@ function onLeave() {
           :x="PAD_LEFT - 8"
           :y="tick.y + 3"
           text-anchor="end"
-          class="fill-zinc-400 text-[10px] tabular-nums"
+          class="fill-zinc-600 text-[10px] tabular-nums"
         >
           {{ tick.label }}
         </text>
@@ -210,17 +212,18 @@ function onLeave() {
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
+        :style="{ filter: `drop-shadow(0 0 6px ${color}60)` }"
       />
 
       <g v-if="lastPoint && !activePoint">
-        <circle :cx="lastPoint.x" :cy="lastPoint.y" r="7" :fill="color" opacity="0.14" />
+        <circle :cx="lastPoint.x" :cy="lastPoint.y" r="10" :fill="color" opacity="0.18" />
         <circle
           :cx="lastPoint.x"
           :cy="lastPoint.y"
-          r="3.5"
+          r="4"
           :fill="color"
-          stroke="#ffffff"
-          stroke-width="2"
+          stroke="#09090b"
+          stroke-width="2.5"
         />
       </g>
 
@@ -230,40 +233,41 @@ function onLeave() {
           :x2="activePoint.x"
           :y1="0"
           :y2="plotH"
-          stroke="#e4e4e7"
+          stroke="rgba(255,255,255,0.14)"
           stroke-width="1"
+          stroke-dasharray="3 3"
         />
         <circle
           :cx="activePoint.x"
           :cy="activePoint.y"
-          r="7"
+          r="10"
           :fill="color"
-          opacity="0.14"
+          opacity="0.2"
         />
         <circle
           :cx="activePoint.x"
           :cy="activePoint.y"
-          r="4"
+          r="4.5"
           :fill="color"
-          stroke="#ffffff"
-          stroke-width="2"
+          stroke="#09090b"
+          stroke-width="2.5"
         />
       </g>
     </svg>
 
     <div
       v-if="activePoint"
-      class="pointer-events-none absolute top-0 z-10 -translate-x-1/2 -translate-y-[calc(100%+6px)] rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 shadow-md"
+      class="pointer-events-none absolute top-0 z-10 -translate-x-1/2 -translate-y-[calc(100%+8px)] rounded-lg border border-white/10 bg-zinc-900/95 px-3 py-2 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] backdrop-blur"
       :style="{ left: `${(activePoint.x / W) * 100}%` }"
     >
-      <p class="text-[11px] leading-none text-zinc-500">{{ activeLabel }}</p>
-      <p class="mt-1 text-xs font-semibold leading-none text-zinc-900 tabular-nums">
+      <p class="text-[10px] tracking-wide text-zinc-500 uppercase">{{ activeLabel }}</p>
+      <p class="mt-0.5 text-sm font-semibold text-zinc-50 tabular-nums">
         {{ activeValue }}
       </p>
     </div>
     <div
       v-if="labels?.length"
-      class="mt-3 flex justify-between pl-[6.4%] text-[11px] text-zinc-500"
+      class="mt-3 flex justify-between pl-[6.9%] text-[11px] text-zinc-500"
     >
       <span v-for="(label, i) in labels" :key="`${label}-${i}`">{{ label }}</span>
     </div>

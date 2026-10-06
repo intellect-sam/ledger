@@ -67,17 +67,18 @@ export interface Goal {
 }
 
 /**
- * Muted, print-like data palette. Desaturated on purpose so the chart colors
- * stay legible without turning the dashboard into a rainbow.
+ * Dark luxe palette. Tuned to glow on near-black surfaces without becoming
+ * neon. Emerald + gold are the signature pair; the rest fan out around them
+ * with enough chroma to stay legible on `#09090b`.
  */
 export const palette = {
-  steel: "#2f6690",
-  green: "#3f8f6f",
-  brick: "#b4544a",
-  amber: "#c08a2e",
-  plum: "#6b5b95",
-  slate: "#5f7a8a",
-  teal: "#4a7c9b",
+  steel: "#60a5fa",   // cool blue
+  green: "#34d399",   // emerald — primary accent
+  brick: "#fb7185",   // warm coral
+  amber: "#d4a04f",   // gold
+  plum: "#c4b5fd",    // lavender
+  slate: "#94a3b8",   // cool slate
+  teal: "#2dd4bf",    // bright teal
 } as const;
 
 export const navItems = [

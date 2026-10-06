@@ -69,11 +69,11 @@ async function handleSubmit() {
     <form class="space-y-5" @submit.prevent="handleSubmit">
       <div
         v-if="error"
-        class="flex items-start gap-2.5 rounded-md border border-rose-200 bg-rose-50 px-3 py-2.5"
+        class="flex items-start gap-2.5 rounded-lg border border-rose-500/25 bg-rose-500/[0.08] px-3 py-2.5"
         role="alert"
       >
-        <AppIcon name="alert-triangle" :size="15" class="mt-px shrink-0 text-rose-600" />
-        <p class="text-sm text-rose-700">{{ error }}</p>
+        <AppIcon name="alert-triangle" :size="15" class="mt-px shrink-0 text-rose-400" />
+        <p class="text-sm text-rose-300">{{ error }}</p>
       </div>
 
       <FormField v-slot="{ id }" label="Full name">
@@ -101,7 +101,7 @@ async function handleSubmit() {
           <template #trailing>
             <button
               type="button"
-              class="focus-ring grid size-8 cursor-pointer place-items-center rounded text-zinc-400 transition-colors hover:text-zinc-700"
+              class="focus-ring grid size-8 cursor-pointer place-items-center rounded-md text-zinc-500 transition-colors hover:text-zinc-200"
               :aria-label="showPassword ? 'Hide password' : 'Show password'"
               @click="showPassword = !showPassword"
             >
@@ -116,33 +116,54 @@ async function handleSubmit() {
               v-for="segment in 3"
               :key="segment"
               class="h-1 flex-1 rounded-full transition-colors"
-              :class="segment <= strength ? 'bg-accent' : 'bg-zinc-200'"
+              :class="
+                segment <= strength
+                  ? strength === 1
+                    ? 'bg-rose-400'
+                    : strength === 2
+                      ? 'bg-amber-400'
+                      : 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]'
+                  : 'bg-white/[0.08]'
+              "
             />
           </div>
-          <p class="mt-1.5 text-xs text-zinc-500">{{ strengthLabel }}</p>
+          <p
+            class="mt-1.5 text-xs"
+            :class="
+              strength === 1
+                ? 'text-rose-400'
+                : strength === 2
+                  ? 'text-amber-300'
+                  : strength === 3
+                    ? 'text-emerald-400'
+                    : 'text-zinc-500'
+            "
+          >
+            {{ strengthLabel }}
+          </p>
         </div>
       </FormField>
 
-      <label class="flex cursor-pointer items-start gap-2.5 text-sm text-zinc-600">
+      <label class="flex cursor-pointer items-start gap-2.5 text-sm text-zinc-400">
         <input
           v-model="agreed"
           type="checkbox"
-          class="mt-0.5 size-4 cursor-pointer rounded border-zinc-300"
+          class="mt-0.5 size-4 cursor-pointer rounded border-white/15 bg-white/5"
         />
         <span>
           I agree to the
-          <a href="#" class="font-medium text-accent transition-colors hover:text-accent-hover">
+          <a href="#" class="font-medium text-emerald-400 transition-colors hover:text-emerald-300">
             Terms
           </a>
           and
-          <a href="#" class="font-medium text-accent transition-colors hover:text-accent-hover">
+          <a href="#" class="font-medium text-emerald-400 transition-colors hover:text-emerald-300">
             Privacy Policy
           </a>
         </span>
       </label>
 
       <AppButton type="submit" variant="accent" block :disabled="loading">
-        {{ loading ? "Creating account..." : "Create account" }}
+        {{ loading ? "Creating account…" : "Create account" }}
       </AppButton>
     </form>
 
@@ -150,7 +171,7 @@ async function handleSubmit() {
       Already have an account?
       <RouterLink
         to="/login"
-        class="font-medium text-accent transition-colors hover:text-accent-hover"
+        class="font-medium text-emerald-400 transition-colors hover:text-emerald-300"
       >
         Sign in
       </RouterLink>

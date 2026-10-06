@@ -27,15 +27,15 @@ const inputId = computed(() => props.id ?? fallbackId);
       :placeholder="placeholder"
       :autocomplete="autocomplete"
       :aria-invalid="invalid || undefined"
-      class="focus-ring h-9 w-full rounded-md border bg-white text-sm text-zinc-900 transition-colors placeholder:text-zinc-400 disabled:cursor-not-allowed disabled:bg-zinc-50"
+      class="focus-ring h-10 w-full rounded-lg border bg-white/[0.03] text-sm text-zinc-100 transition-colors placeholder:text-zinc-500 hover:bg-white/[0.05] focus:bg-white/[0.06] disabled:cursor-not-allowed disabled:bg-white/[0.02] disabled:text-zinc-500"
       :class="[
-        $slots.trailing ? 'pr-10' : 'pr-3',
-        $slots.leading ? 'pl-8' : 'pl-3',
-        invalid ? 'border-rose-300' : 'border-zinc-300',
+        $slots.trailing ? 'pr-10' : 'pr-3.5',
+        $slots.leading ? 'pl-9' : 'pl-3.5',
+        invalid ? 'border-rose-500/40' : 'border-white/10 focus:border-emerald-500/40',
       ]"
     />
 
-    <div v-if="$slots.leading" class="absolute inset-y-0 left-2.5 flex items-center">
+    <div v-if="$slots.leading" class="absolute inset-y-0 left-3 flex items-center">
       <slot name="leading" />
     </div>
 

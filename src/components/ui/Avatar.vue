@@ -16,7 +16,6 @@ const sizes = {
   lg: "size-14 text-base",
 };
 
-/** "Sam Rivera" → "SR" */
 const initials = computed(() =>
   props.name
     .split(/\s+/)
@@ -29,7 +28,7 @@ const initials = computed(() =>
 
 <template>
   <span
-    class="inline-grid shrink-0 place-items-center overflow-hidden rounded-full bg-zinc-800 font-medium text-white ring-1 ring-zinc-900/5"
+    class="inline-grid shrink-0 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-emerald-500/90 to-emerald-700 font-semibold text-zinc-950 ring-1 ring-white/15"
     :class="sizes[size]"
   >
     <img v-if="src" :src="src" :alt="name" class="size-full object-cover" />

@@ -11,20 +11,23 @@ const props = withDefaults(
     /** Switches the bar to red once `value` exceeds `max`. */
     warnOnOverflow?: boolean;
   }>(),
-  { color: "#2f6690", height: 6, warnOnOverflow: true },
+  { color: "#34d399", height: 6, warnOnOverflow: true },
 );
 
 const percent = computed(() => (props.max > 0 ? (props.value / props.max) * 100 : 0));
 const width = computed(() => Math.min(Math.max(percent.value, 0), 100));
 
 const barColor = computed(() =>
-  props.warnOnOverflow && percent.value > 100 ? "#b4544a" : props.color,
+  props.warnOnOverflow && percent.value > 100 ? "#fb7185" : props.color,
 );
+
+/** Soft glow under the fill, same hue, half-strength. */
+const barShadow = computed(() => `0 0 10px -2px ${barColor.value}`);
 </script>
 
 <template>
   <div
-    class="w-full overflow-hidden rounded-full bg-zinc-100"
+    class="w-full overflow-hidden rounded-full bg-white/[0.05] ring-1 ring-inset ring-white/[0.04]"
     :style="{ height: `${height}px` }"
     role="progressbar"
     :aria-valuenow="Math.round(percent)"
@@ -33,7 +36,7 @@ const barColor = computed(() =>
   >
     <div
       class="h-full rounded-full transition-[width] duration-500 ease-out"
-      :style="{ width: `${width}%`, backgroundColor: barColor }"
+      :style="{ width: `${width}%`, backgroundColor: barColor, boxShadow: barShadow }"
     />
   </div>
 </template>

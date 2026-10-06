@@ -9,7 +9,7 @@ const props = withDefaults(
     height?: number;
     filled?: boolean;
   }>(),
-  { color: "#3f8f6f", width: 96, height: 32, filled: true },
+  { color: "#34d399", width: 96, height: 32, filled: true },
 );
 
 const uid = useId();
@@ -50,7 +50,7 @@ const geometry = computed(() => {
   >
     <defs>
       <linearGradient :id="gradientId" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" :stop-color="color" stop-opacity="0.18" />
+        <stop offset="0%" :stop-color="color" stop-opacity="0.4" />
         <stop offset="100%" :stop-color="color" stop-opacity="0" />
       </linearGradient>
     </defs>
@@ -63,6 +63,7 @@ const geometry = computed(() => {
       stroke-width="1.75"
       stroke-linecap="round"
       stroke-linejoin="round"
+      :style="{ filter: `drop-shadow(0 0 3px ${color}80)` }"
     />
   </svg>
 </template>

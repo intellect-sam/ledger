@@ -62,7 +62,7 @@ const activeArc = computed(() =>
         :cy="center"
         :r="radius"
         fill="none"
-        stroke="#f1f1f3"
+        stroke="rgba(255,255,255,0.04)"
         :stroke-width="thickness"
       />
 
@@ -75,10 +75,14 @@ const activeArc = computed(() =>
         fill="none"
         :stroke="arc.color"
         :stroke-width="thickness"
+        stroke-linecap="round"
         :stroke-dasharray="`${arc.dash} ${arc.gap}`"
         :stroke-dashoffset="arc.offset"
         class="cursor-pointer transition-opacity"
-        :style="{ opacity: activeIndex === null || activeIndex === arc.index ? 1 : 0.25 }"
+        :style="{
+          opacity: activeIndex === null || activeIndex === arc.index ? 1 : 0.22,
+          filter: activeIndex === arc.index ? `drop-shadow(0 0 8px ${arc.color}80)` : 'none',
+        }"
         @mouseenter="activeIndex = arc.index"
         @mouseleave="activeIndex = null"
       />
@@ -86,14 +90,14 @@ const activeArc = computed(() =>
 
     <div class="pointer-events-none absolute inset-0 grid place-content-center text-center">
       <template v-if="activeArc">
-        <p class="text-[11px] text-zinc-500">{{ activeArc.label }}</p>
-        <p class="mt-0.5 text-lg font-semibold text-zinc-900 tabular-nums">
+        <p class="text-[10px] tracking-wide text-zinc-500 uppercase">{{ activeArc.label }}</p>
+        <p class="num-display mt-1 text-xl font-semibold text-zinc-50">
           {{ activeArc.percent.toFixed(1) }}%
         </p>
       </template>
       <template v-else>
-        <p class="text-[11px] text-zinc-500">{{ centerLabel }}</p>
-        <p class="mt-0.5 text-lg font-semibold text-zinc-900 tabular-nums">
+        <p class="text-[10px] tracking-wide text-zinc-500 uppercase">{{ centerLabel }}</p>
+        <p class="num-display mt-1 text-xl font-semibold text-zinc-50">
           {{ centerValue ?? slices.length }}
         </p>
       </template>

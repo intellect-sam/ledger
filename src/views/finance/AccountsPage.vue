@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import { storeToRefs } from "pinia";
 import DashboardLayout from "@/components/layout/DashboardLayout.vue";
 import CardPanel from "@/components/ui/CardPanel.vue";
 import StatCard from "@/components/ui/StatCard.vue";
@@ -8,8 +9,14 @@ import AppIcon from "@/components/ui/AppIcon.vue";
 import Badge from "@/components/ui/Badge.vue";
 import DonutChart from "@/components/charts/DonutChart.vue";
 import AccountCard from "@/components/finance/AccountCard.vue";
+import AccountModal from "@/components/finance/AccountModal.vue";
 import { formatCurrency, formatPercent } from "@/utils/format";
-import { accounts, palette } from "@/data/mock";
+import { palette } from "@/data/mock";
+import { useAccountsStore } from "@/stores/accounts";
+
+const { items: accounts } = storeToRefs(useAccountsStore());
+
+const linkOpen = ref(false);
 
 const kindColors: Record<string, string> = {
   checking: palette.teal,
@@ -28,15 +35,15 @@ const kindLabels: Record<string, string> = {
 };
 
 const assets = computed(() =>
-  accounts.filter((a) => a.balance > 0).reduce((sum, a) => sum + a.balance, 0),
+  accounts.value.filter((a) => a.balance > 0).reduce((sum, a) => sum + a.balance, 0),
 );
 const liabilities = computed(() =>
-  accounts.filter((a) => a.balance < 0).reduce((sum, a) => sum + Math.abs(a.balance), 0),
+  accounts.value.filter((a) => a.balance < 0).reduce((sum, a) => sum + Math.abs(a.balance), 0),
 );
 const netWorth = computed(() => assets.value - liabilities.value);
 
 const distribution = computed(() =>
-  accounts
+  accounts.value
     .filter((account) => account.balance > 0)
     .map((account) => ({
       label: account.name,
@@ -49,15 +56,17 @@ const distribution = computed(() =>
 <template>
   <DashboardLayout title="Accounts" subtitle="5 connected accounts · synced 8 minutes ago">
     <template #actions>
-      <AppButton variant="outline">
+      <AppButton variant="outline" to="/settings#security">
         <AppIcon name="lock" :size="15" />
         Manage access
       </AppButton>
-      <AppButton variant="primary">
+      <AppButton variant="primary" @click="linkOpen = true">
         <AppIcon name="plus" :size="15" />
         Link account
       </AppButton>
     </template>
+
+    <AccountModal v-model:open="linkOpen" />
 
     <div class="grid gap-4 sm:grid-cols-3">
       <StatCard
@@ -84,8 +93,10 @@ const distribution = computed(() =>
       />
     </div>
 
-    <div class="mt-6 mb-3 flex items-center justify-between gap-4">
-      <h2 class="text-section font-semibold tracking-tight text-zinc-900">Connected accounts</h2>
+    <div class="mt-8 mb-4 flex items-center justify-between gap-4">
+      <h2 class="font-display text-section font-semibold tracking-tight text-zinc-50">
+        Connected accounts
+      </h2>
       <Badge variant="mint" dot>All synced</Badge>
     </div>
 
@@ -94,7 +105,8 @@ const distribution = computed(() =>
 
       <button
         type="button"
-        class="focus-ring grid cursor-pointer place-items-center rounded-lg border border-dashed border-zinc-300 p-4 text-zinc-500 transition-colors hover:border-zinc-400 hover:bg-zinc-50 hover:text-zinc-700"
+        class="focus-ring group grid cursor-pointer place-items-center rounded-xl border border-dashed border-white/10 p-4 text-zinc-500 transition-all hover:border-emerald-500/40 hover:bg-emerald-500/[0.03] hover:text-emerald-300"
+        @click="linkOpen = true"
       >
         <span class="flex items-center gap-2 py-9 text-sm font-medium">
           <AppIcon name="plus" :size="15" />
@@ -108,17 +120,20 @@ const distribution = computed(() =>
         <div class="flex flex-col items-center gap-6">
           <DonutChart
             :slices="distribution"
-            :size="170"
+            :size="180"
             :thickness="18"
             center-label="Assets"
             :center-value="formatCurrency(assets, false)"
           />
 
-          <ul class="w-full space-y-2.5">
+          <ul class="w-full space-y-3">
             <li v-for="slice in distribution" :key="slice.label" class="flex items-center gap-2.5">
-              <span class="size-2 shrink-0 rounded-sm" :style="{ backgroundColor: slice.color }" />
-              <span class="min-w-0 flex-1 truncate text-sm text-zinc-600">{{ slice.label }}</span>
-              <span class="shrink-0 text-xs text-zinc-400 tabular-nums">
+              <span
+                class="size-2 shrink-0 rounded-sm"
+                :style="{ backgroundColor: slice.color, boxShadow: `0 0 6px ${slice.color}aa` }"
+              />
+              <span class="min-w-0 flex-1 truncate text-sm text-zinc-300">{{ slice.label }}</span>
+              <span class="shrink-0 text-xs text-zinc-500 tabular-nums">
                 {{ formatPercent(assets ? (slice.value / assets) * 100 : 0, 0) }}
               </span>
             </li>
@@ -140,7 +155,7 @@ const distribution = computed(() =>
         </template>
 
         <div
-          class="hidden grid-cols-[minmax(0,1fr)_7rem_8rem_5rem] gap-4 border-b border-zinc-100 px-5 py-2 text-[11px] font-medium tracking-wide text-zinc-400 uppercase md:grid"
+          class="hidden grid-cols-[minmax(0,1fr)_7rem_8rem_5rem] gap-4 border-b border-white/[0.06] px-5 py-2.5 text-[10px] font-semibold tracking-[0.12em] text-zinc-600 uppercase md:grid"
         >
           <span>Account</span>
           <span>Type</span>
@@ -148,14 +163,14 @@ const distribution = computed(() =>
           <span class="text-right">Change</span>
         </div>
 
-        <ul class="divide-y divide-zinc-100">
+        <ul class="divide-y divide-white/[0.05]">
           <li
             v-for="account in accounts"
             :key="account.id"
-            class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-3 transition-colors hover:bg-zinc-50 md:grid-cols-[minmax(0,1fr)_7rem_8rem_5rem]"
+            class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-3.5 transition-colors hover:bg-white/[0.03] md:grid-cols-[minmax(0,1fr)_7rem_8rem_5rem]"
           >
             <div class="min-w-0">
-              <p class="truncate text-sm font-medium text-zinc-900">{{ account.name }}</p>
+              <p class="truncate text-sm font-medium text-zinc-100">{{ account.name }}</p>
               <p class="truncate text-xs text-zinc-500">{{ account.detail }}</p>
             </div>
 
@@ -165,14 +180,14 @@ const distribution = computed(() =>
 
             <span
               class="text-right text-sm font-medium tabular-nums"
-              :class="account.balance < 0 ? 'text-rose-700' : 'text-zinc-900'"
+              :class="account.balance < 0 ? 'text-rose-400' : 'text-zinc-100'"
             >
               {{ formatCurrency(account.balance) }}
             </span>
 
             <span
               class="hidden text-right text-sm tabular-nums md:block"
-              :class="account.change >= 0 ? 'text-emerald-700' : 'text-rose-700'"
+              :class="account.change >= 0 ? 'text-emerald-400' : 'text-rose-400'"
             >
               {{ account.change >= 0 ? "+" : "−" }}{{ formatPercent(Math.abs(account.change)) }}
             </span>

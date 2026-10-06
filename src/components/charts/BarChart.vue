@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, useId } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -13,17 +13,21 @@ const props = withDefaults(
   }>(),
   {
     height: 240,
-    incomeColor: "#3f8f6f",
-    expenseColor: "#b4544a",
+    incomeColor: "#34d399",
+    expenseColor: "#fb7185",
     incomeLabel: "Income",
     expenseLabel: "Expenses",
   },
 );
 
 const W = 720;
-const PAD_LEFT = 46;
-const PAD_RIGHT = 8;
+const PAD_LEFT = 50;
+const PAD_RIGHT = 10;
 const PLOT_W = W - PAD_LEFT - PAD_RIGHT;
+
+const uid = useId().replace(/[^a-zA-Z0-9-_]/g, "");
+const incomeGradId = `bar-income-${uid}`;
+const expenseGradId = `bar-expense-${uid}`;
 
 const max = computed(() => {
   const values = props.data.flatMap((d) => [d.income, d.expense]);
@@ -36,7 +40,7 @@ const groups = computed(() => {
   const count = props.data.length;
   if (count === 0) return [];
   const groupWidth = PLOT_W / count;
-  const barWidth = Math.min(groupWidth * 0.26, 14);
+  const barWidth = Math.min(groupWidth * 0.3, 16);
   const gap = 3;
 
   return props.data.map((point, index) => {
@@ -62,9 +66,10 @@ const groups = computed(() => {
   });
 });
 
-function barPath(x: number, y: number, w: number, h: number): string {
+function roundedBarPath(x: number, y: number, w: number, h: number, r = 3): string {
   if (h <= 0.5) return "";
-  return `M${x},${y + h} L${x},${y} L${x + w},${y} L${x + w},${y + h} Z`;
+  const radius = Math.min(r, w / 2, h);
+  return `M${x},${y + h} L${x},${y + radius} Q${x},${y} ${x + radius},${y} L${x + w - radius},${y} Q${x + w},${y} ${x + w},${y + radius} L${x + w},${y + h} Z`;
 }
 
 const STEPS = [3, 2, 1, 0];
@@ -94,6 +99,17 @@ const ticks = computed(() =>
       role="img"
       :aria-label="`${incomeLabel} versus ${expenseLabel} by month`"
     >
+      <defs>
+        <linearGradient :id="incomeGradId" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" :stop-color="incomeColor" stop-opacity="1" />
+          <stop offset="100%" :stop-color="incomeColor" stop-opacity="0.5" />
+        </linearGradient>
+        <linearGradient :id="expenseGradId" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" :stop-color="expenseColor" stop-opacity="1" />
+          <stop offset="100%" :stop-color="expenseColor" stop-opacity="0.5" />
+        </linearGradient>
+      </defs>
+
       <line
         v-for="tick in ticks"
         :key="`grid-${tick.y}`"
@@ -101,8 +117,9 @@ const ticks = computed(() =>
         :x2="W - PAD_RIGHT"
         :y1="tick.y"
         :y2="tick.y"
-        stroke="#eeeef1"
+        stroke="rgba(255,255,255,0.05)"
         stroke-width="1"
+        stroke-dasharray="2 4"
       />
 
       <text
@@ -111,7 +128,7 @@ const ticks = computed(() =>
         :x="PAD_LEFT - 8"
         :y="tick.y + 3"
         text-anchor="end"
-        class="fill-zinc-400 text-[10px] tabular-nums"
+        class="fill-zinc-600 text-[10px] tabular-nums"
       >
         {{ tick.label }}
       </text>
@@ -121,23 +138,23 @@ const ticks = computed(() =>
         :x2="W - PAD_RIGHT"
         :y1="height - 0.5"
         :y2="height - 0.5"
-        stroke="#e4e4e7"
+        stroke="rgba(255,255,255,0.08)"
         stroke-width="1"
       />
 
       <g v-for="(group, i) in groups" :key="i">
         <path
-          :d="barPath(group.income.x, group.income.y, group.income.w, group.income.h)"
-          :fill="incomeColor"
+          :d="roundedBarPath(group.income.x, group.income.y, group.income.w, group.income.h)"
+          :fill="`url(#${incomeGradId})`"
         />
         <path
-          :d="barPath(group.expense.x, group.expense.y, group.expense.w, group.expense.h)"
-          :fill="expenseColor"
+          :d="roundedBarPath(group.expense.x, group.expense.y, group.expense.w, group.expense.h)"
+          :fill="`url(#${expenseGradId})`"
         />
       </g>
     </svg>
 
-    <div class="mt-3 flex pl-[6.4%] text-[11px] text-zinc-500">
+    <div class="mt-3 flex pl-[6.9%] text-[11px] text-zinc-500">
       <span
         v-for="(group, i) in groups"
         :key="`${group.label}-${i}`"

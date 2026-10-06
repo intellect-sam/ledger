@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { storeToRefs } from "pinia";
 import DashboardLayout from "@/components/layout/DashboardLayout.vue";
 import CardPanel from "@/components/ui/CardPanel.vue";
 import StatCard from "@/components/ui/StatCard.vue";
@@ -8,21 +9,24 @@ import AppIcon from "@/components/ui/AppIcon.vue";
 import TextInput from "@/components/ui/TextInput.vue";
 import SelectField from "@/components/ui/SelectField.vue";
 import TransactionList from "@/components/finance/TransactionList.vue";
+import TransactionModal from "@/components/finance/TransactionModal.vue";
 import { formatCurrency, formatSignedCurrency } from "@/utils/format";
-import { transactions } from "@/data/mock";
+import { useTransactionsStore } from "@/stores/transactions";
 
-/** UI-only filter state — wire this to your store when you add data fetching. */
+const { items: transactions } = storeToRefs(useTransactionsStore());
+
 const query = ref("");
 const typeFilter = ref("all");
 const categoryFilter = ref("all");
+const addOpen = ref(false);
 
 const categories = computed(() => [
   "all",
-  ...Array.from(new Set(transactions.map((item) => item.category))).sort(),
+  ...Array.from(new Set(transactions.value.map((item) => item.category))).sort(),
 ]);
 
 const filtered = computed(() =>
-  transactions.filter((item) => {
+  transactions.value.filter((item) => {
     const needle = query.value.trim().toLowerCase();
     const matchesQuery =
       needle === "" ||
@@ -56,11 +60,13 @@ const pages = [1, 2, 3, 4, 5];
         <AppIcon name="calendar" :size="15" />
         Sep 1 – Sep 30
       </AppButton>
-      <AppButton variant="primary">
+      <AppButton variant="primary" @click="addOpen = true">
         <AppIcon name="plus" :size="15" />
         Add transaction
       </AppButton>
     </template>
+
+    <TransactionModal v-model:open="addOpen" />
 
     <div class="grid gap-4 sm:grid-cols-3">
       <StatCard label="Money in" :value="formatCurrency(moneyIn, false)" />
@@ -73,11 +79,11 @@ const pages = [1, 2, 3, 4, 5];
     </div>
 
     <CardPanel class="mt-4" :padded="false">
-      <div class="flex flex-col gap-3 border-b border-zinc-100 p-4 lg:flex-row lg:items-center">
+      <div class="flex flex-col gap-3 border-b border-white/[0.06] p-4 lg:flex-row lg:items-center">
         <div class="w-full lg:max-w-xs">
           <TextInput v-model="query" type="search" placeholder="Search merchant or category">
             <template #leading>
-              <AppIcon name="search" :size="15" class="text-zinc-400" />
+              <AppIcon name="search" :size="15" class="text-zinc-500" />
             </template>
           </TextInput>
         </div>
@@ -123,7 +129,7 @@ const pages = [1, 2, 3, 4, 5];
           <nav class="flex items-center gap-0.5" aria-label="Pagination">
             <button
               type="button"
-              class="focus-ring grid size-8 cursor-pointer place-items-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700"
+              class="focus-ring grid size-8 cursor-pointer place-items-center rounded-md text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
               aria-label="Previous page"
             >
               <AppIcon name="chevron-left" :size="15" />
@@ -135,15 +141,15 @@ const pages = [1, 2, 3, 4, 5];
               class="focus-ring size-8 cursor-pointer rounded-md text-sm tabular-nums transition-colors"
               :class="
                 page === 1
-                  ? 'bg-zinc-900 font-medium text-white'
-                  : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
+                  ? 'bg-emerald-500/15 font-semibold text-emerald-300 ring-1 ring-inset ring-emerald-500/30'
+                  : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'
               "
             >
               {{ page }}
             </button>
             <button
               type="button"
-              class="focus-ring grid size-8 cursor-pointer place-items-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700"
+              class="focus-ring grid size-8 cursor-pointer place-items-center rounded-md text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
               aria-label="Next page"
             >
               <AppIcon name="chevron-right" :size="15" />

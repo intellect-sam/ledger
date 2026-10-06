@@ -11,13 +11,13 @@ withDefaults(
 </script>
 
 <template>
-  <section class="rounded-lg border border-zinc-200 bg-white shadow-card">
+  <section class="surface-card relative overflow-hidden rounded-xl">
     <header
       v-if="title || $slots.actions"
-      class="flex items-start justify-between gap-4 border-b border-zinc-100 px-5 py-4"
+      class="flex items-start justify-between gap-4 border-b border-white/[0.06] px-5 py-4"
     >
       <div class="min-w-0">
-        <h2 class="truncate text-section font-semibold tracking-tight text-zinc-900">
+        <h2 class="truncate text-section font-semibold tracking-tight text-zinc-50">
           {{ title }}
         </h2>
         <p v-if="subtitle" class="mt-0.5 truncate text-xs text-zinc-500">{{ subtitle }}</p>
@@ -31,7 +31,7 @@ withDefaults(
       <slot />
     </div>
 
-    <footer v-if="$slots.footer" class="border-t border-zinc-100 px-5 py-3.5">
+    <footer v-if="$slots.footer" class="border-t border-white/[0.06] px-5 py-3.5">
       <slot name="footer" />
     </footer>
   </section>

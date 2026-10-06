@@ -19,9 +19,9 @@ const props = withDefaults(
 );
 
 const valueTone: Record<"neutral" | "positive" | "negative", string> = {
-  neutral: "text-zinc-900",
-  positive: "text-emerald-700",
-  negative: "text-rose-700",
+  neutral: "text-zinc-50",
+  positive: "text-emerald-400",
+  negative: "text-rose-400",
 };
 
 const isGood = computed(() => {
@@ -32,27 +32,35 @@ const isGood = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-lg border border-zinc-200 bg-white p-5 shadow-card">
-    <div class="flex items-start justify-between gap-3">
-      <p class="text-xs font-medium text-zinc-500">{{ label }}</p>
-      <AppIcon v-if="icon" :name="icon" :size="16" class="text-zinc-400" />
+  <div class="surface-card group relative overflow-hidden rounded-xl p-5 transition-colors hover:border-white/10">
+    <!-- Decorative emerald bloom in the corner, visible on hover. -->
+    <div
+      class="pointer-events-none absolute -top-10 -right-10 h-32 w-32 rounded-full bg-emerald-500/5 blur-2xl transition-opacity duration-500 group-hover:bg-emerald-500/10"
+      aria-hidden="true"
+    />
+
+    <div class="relative flex items-start justify-between gap-3">
+      <p class="text-[11px] font-medium tracking-[0.08em] text-zinc-500 uppercase">
+        {{ label }}
+      </p>
+      <AppIcon v-if="icon" :name="icon" :size="16" class="text-zinc-600" />
     </div>
 
     <p
-      class="mt-3 text-3xl font-semibold tracking-tight tabular-nums"
+      class="num-display relative mt-3 text-3xl font-semibold tracking-tight"
       :class="valueTone[tone]"
     >
       {{ value }}
     </p>
 
-    <div v-if="change !== undefined || hint" class="mt-3 flex items-center gap-2">
+    <div v-if="change !== undefined || hint" class="relative mt-3 flex items-center gap-2">
       <span
         v-if="change !== undefined && isGood !== null"
-        class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium tabular-nums ring-1 ring-inset"
+        class="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium tabular-nums ring-1 ring-inset"
         :class="
           isGood
-            ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
-            : 'bg-rose-50 text-rose-700 ring-rose-600/20'
+            ? 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/25'
+            : 'bg-rose-500/10 text-rose-400 ring-rose-500/25'
         "
       >
         <AppIcon

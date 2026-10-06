@@ -37,8 +37,10 @@ const netWorthChange =
 </script>
 
 <template>
-  <div class="min-h-screen bg-white">
-    <header class="sticky top-0 z-40 border-b border-zinc-200 bg-white">
+  <div class="relative min-h-screen">
+    <header
+      class="sticky top-0 z-40 border-b border-white/[0.06] bg-zinc-950/70 backdrop-blur-xl"
+    >
       <div class="mx-auto flex h-16 max-w-6xl items-center gap-8 px-6">
         <RouterLink to="/" aria-label="Ledger home">
           <BrandMark />
@@ -49,7 +51,7 @@ const netWorthChange =
             v-for="section in sections"
             :key="section.href"
             :href="section.href"
-            class="text-sm text-zinc-600 transition-colors hover:text-zinc-900"
+            class="text-sm text-zinc-400 transition-colors hover:text-zinc-100"
           >
             {{ section.label }}
           </a>
@@ -63,105 +65,187 @@ const netWorthChange =
     </header>
 
     <main>
-      <section class="border-b border-zinc-200 bg-zinc-50">
-        <div class="mx-auto max-w-6xl px-6 pt-16 pb-14 sm:pt-24 sm:pb-16">
-          <div class="max-w-2xl">
-            <p class="text-xs font-medium tracking-wide text-accent uppercase">
-              Personal finance
-            </p>
-            <h1
-              class="mt-4 text-4xl font-semibold tracking-tight text-balance text-zinc-900 sm:text-5xl"
+      <!-- Hero -->
+      <section class="relative overflow-hidden">
+        <!-- Aurora -->
+        <div
+          class="pointer-events-none absolute inset-0"
+          aria-hidden="true"
+        >
+          <div class="absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-emerald-500/20 blur-[140px]" />
+          <div class="absolute -top-20 right-1/4 h-[400px] w-[400px] rounded-full bg-amber-500/10 blur-[140px]" />
+        </div>
+
+        <div class="relative mx-auto max-w-6xl px-6 pt-20 pb-14 sm:pt-28 sm:pb-20">
+          <div class="max-w-3xl">
+            <span
+              class="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/[0.08] px-3 py-1 text-[11px] font-medium tracking-wide text-emerald-300 uppercase"
             >
-              Know exactly where your money goes.
+              <span class="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.9)]" />
+              Personal finance · September cohort
+            </span>
+            <h1
+              class="font-display mt-6 text-5xl font-semibold tracking-tight text-balance text-zinc-50 sm:text-6xl"
+            >
+              Know exactly where your
+              <span class="relative inline-block">
+                <span class="relative z-10 bg-gradient-to-r from-emerald-300 via-emerald-400 to-amber-200 bg-clip-text text-transparent">
+                  money
+                </span>
+              </span>
+              goes.
             </h1>
-            <p class="mt-5 text-lg leading-relaxed text-zinc-600">
-              Ledger pulls your accounts, budgets, and bills into one monthly view, so the
-              numbers add up before the month ends rather than after.
+            <p class="mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400">
+              Ledger pulls your accounts, budgets, and bills into one monthly view —
+              so the numbers add up before the month ends rather than after.
             </p>
 
-            <div class="mt-8 flex flex-wrap items-center gap-3">
-              <AppButton to="/register" variant="accent">Get started</AppButton>
+            <div class="mt-10 flex flex-wrap items-center gap-3">
+              <AppButton to="/register" variant="accent">
+                Get started
+                <AppIcon name="arrow-right" :size="14" :stroke-width="2.25" />
+              </AppButton>
               <AppButton to="/login" variant="outline">See a demo</AppButton>
             </div>
 
-            <p class="mt-4 text-xs text-zinc-500">No card required · 2-minute setup</p>
+            <p class="mt-5 text-xs text-zinc-500">
+              No card required · 2-minute setup · SOC 2 Type II
+            </p>
           </div>
         </div>
 
-        <div class="mx-auto max-w-6xl px-6 pb-16 sm:pb-20">
-          <div class="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-card">
-            <div class="flex items-center justify-between gap-4 border-b border-zinc-100 px-5 py-3.5">
-              <div>
-                <p class="text-sm font-semibold text-zinc-900">Net worth</p>
-                <p class="mt-0.5 text-xs text-zinc-500">Last 12 months</p>
+        <!-- Hero chart card -->
+        <div class="relative mx-auto max-w-6xl px-6 pb-24 sm:pb-28">
+          <div class="surface-card relative overflow-hidden rounded-2xl p-1">
+            <!-- Soft gold inner frame -->
+            <div
+              class="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-amber-500/10"
+              aria-hidden="true"
+            />
+            <div class="rounded-xl bg-zinc-950/60">
+              <div class="flex items-center justify-between gap-4 border-b border-white/[0.06] px-6 py-4">
+                <div>
+                  <p class="text-[11px] tracking-wide text-zinc-500 uppercase">Net worth</p>
+                  <p class="num-display mt-1 text-2xl font-semibold text-zinc-50">
+                    {{ formatCompactCurrency(last ?? 0) }}
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p class="text-[11px] tracking-wide text-zinc-500 uppercase">Last 12 months</p>
+                  <p
+                    class="mt-1 inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-xs font-medium text-emerald-400 tabular-nums ring-1 ring-emerald-500/25 ring-inset"
+                  >
+                    <AppIcon name="trending-up" :size="13" :stroke-width="2" />
+                    {{ netWorthChange >= 0 ? "+" : "" }}{{ formatPercent(netWorthChange) }}
+                  </p>
+                </div>
               </div>
-              <p
-                class="inline-flex items-center gap-1 rounded bg-emerald-50 px-1.5 py-0.5 text-xs font-medium text-emerald-700 tabular-nums ring-1 ring-emerald-600/20 ring-inset"
-              >
-                <AppIcon name="trending-up" :size="13" :stroke-width="2" />
-                {{ netWorthChange >= 0 ? "+" : "" }}{{ formatPercent(netWorthChange) }}
-              </p>
-            </div>
 
-            <div class="px-5 py-5">
-              <AreaChart
-                :data="netWorthSeries"
-                :interactive="false"
-                :height="200"
-                :format-value="formatCompactCurrency"
-              />
+              <div class="px-6 py-6">
+                <AreaChart
+                  :data="netWorthSeries"
+                  :interactive="false"
+                  :height="220"
+                  :format-value="formatCompactCurrency"
+                />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="product" class="scroll-mt-16 border-b border-zinc-200">
-        <div class="mx-auto max-w-6xl px-6 py-16 sm:py-20">
-          <h2 class="text-2xl font-semibold tracking-tight text-zinc-900">What's inside</h2>
-          <p class="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            Six screens covering the month end to end. Here are the three you'll open most.
-          </p>
+      <!-- Product -->
+      <section id="product" class="relative scroll-mt-16 border-t border-white/[0.06]">
+        <div class="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+          <div class="max-w-2xl">
+            <p class="text-[11px] font-semibold tracking-[0.14em] text-emerald-400 uppercase">
+              What's inside
+            </p>
+            <h2 class="font-display mt-4 text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
+              Six screens covering the month, end to end.
+            </h2>
+            <p class="mt-4 text-base leading-relaxed text-zinc-400">
+              Here are the three you'll open most.
+            </p>
+          </div>
 
-          <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <div
               v-for="feature in features"
               :key="feature.title"
-              class="rounded-lg border border-zinc-200 bg-white p-6 shadow-card"
+              class="surface-card group relative overflow-hidden rounded-xl p-6 transition-colors hover:border-white/10"
             >
-              <span class="grid size-9 place-items-center rounded-md bg-accent-soft text-accent">
-                <AppIcon :name="feature.icon" :size="17" />
+              <div
+                class="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full bg-emerald-500/[0.05] blur-2xl transition-opacity duration-500 group-hover:bg-emerald-500/[0.12]"
+                aria-hidden="true"
+              />
+              <span
+                class="relative grid size-11 place-items-center rounded-xl bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/25"
+              >
+                <AppIcon :name="feature.icon" :size="18" :stroke-width="2" />
               </span>
-              <h3 class="mt-4 text-section font-semibold tracking-tight text-zinc-900">
+              <h3 class="relative mt-5 text-lg font-semibold tracking-tight text-zinc-50">
                 {{ feature.title }}
               </h3>
-              <p class="mt-2 text-sm leading-relaxed text-zinc-600">{{ feature.body }}</p>
+              <p class="relative mt-2 text-sm leading-relaxed text-zinc-400">
+                {{ feature.body }}
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="pricing" class="scroll-mt-16 border-b border-zinc-200">
-        <div class="mx-auto max-w-6xl px-6 py-16 sm:py-20">
-          <div class="rounded-lg bg-accent px-8 py-10 shadow-card sm:px-12 sm:py-14">
-            <h2 class="max-w-lg text-2xl font-semibold tracking-tight text-balance text-white">
-              Start your first month with everything in one place.
-            </h2>
-            <p class="mt-3 max-w-lg text-sm leading-relaxed text-white/80">
-              Connect your accounts, set a budget per category, and let the month close itself.
-            </p>
+      <!-- Pricing / CTA -->
+      <section id="pricing" class="scroll-mt-16 border-t border-white/[0.06]">
+        <div class="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+          <div
+            class="relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.08] via-zinc-900/50 to-amber-500/[0.06] px-8 py-12 sm:px-14 sm:py-16"
+          >
+            <!-- Decorative glows -->
+            <div
+              class="pointer-events-none absolute -top-32 -left-20 h-80 w-80 rounded-full bg-emerald-500/20 blur-[100px]"
+              aria-hidden="true"
+            />
+            <div
+              class="pointer-events-none absolute -right-24 -bottom-32 h-80 w-80 rounded-full bg-amber-500/15 blur-[100px]"
+              aria-hidden="true"
+            />
+            <!-- Gold hairline on top -->
+            <div class="hairline-gold absolute inset-x-10 top-0" aria-hidden="true" />
 
-            <RouterLink
-              to="/register"
-              class="mt-7 inline-flex h-9 items-center rounded-md bg-white px-3 text-sm font-medium text-accent transition-colors hover:bg-zinc-100"
-            >
-              Create your account
-            </RouterLink>
+            <div class="relative max-w-xl">
+              <p class="text-[11px] font-semibold tracking-[0.14em] text-amber-300 uppercase">
+                Start free
+              </p>
+              <h2 class="font-display mt-4 text-3xl font-semibold tracking-tight text-balance text-zinc-50 sm:text-4xl">
+                Close the month properly — with everything in one place.
+              </h2>
+              <p class="mt-4 text-base leading-relaxed text-zinc-300">
+                Connect your accounts, set a budget per category, and let the month close itself.
+              </p>
+
+              <div class="mt-10 flex flex-wrap items-center gap-3">
+                <RouterLink
+                  to="/register"
+                  class="glow-emerald focus-ring inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-lg bg-emerald-500 px-4 text-sm font-medium text-zinc-950 transition-all hover:bg-emerald-400"
+                >
+                  Create your account
+                  <AppIcon name="arrow-right" :size="14" :stroke-width="2.25" />
+                </RouterLink>
+                <RouterLink
+                  to="/login"
+                  class="focus-ring inline-flex h-10 items-center rounded-lg border border-white/15 bg-white/[0.03] px-4 text-sm font-medium text-zinc-200 transition-colors hover:bg-white/[0.07]"
+                >
+                  Sign in instead
+                </RouterLink>
+              </div>
+            </div>
           </div>
         </div>
       </section>
     </main>
 
-    <footer>
+    <footer class="border-t border-white/[0.06]">
       <div
         class="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10 sm:flex-row sm:items-center sm:justify-between"
       >
@@ -171,17 +255,17 @@ const netWorthChange =
         </div>
 
         <nav class="flex flex-wrap gap-x-6 gap-y-2 text-xs text-zinc-500">
-          <a href="#product" class="transition-colors hover:text-zinc-900">Product</a>
-          <a href="#pricing" class="transition-colors hover:text-zinc-900">Pricing</a>
-          <RouterLink to="/login" class="transition-colors hover:text-zinc-900">Sign in</RouterLink>
-          <RouterLink to="/register" class="transition-colors hover:text-zinc-900">
+          <a href="#product" class="transition-colors hover:text-zinc-200">Product</a>
+          <a href="#pricing" class="transition-colors hover:text-zinc-200">Pricing</a>
+          <RouterLink to="/login" class="transition-colors hover:text-zinc-200">Sign in</RouterLink>
+          <RouterLink to="/register" class="transition-colors hover:text-zinc-200">
             Get started
           </RouterLink>
         </nav>
       </div>
 
-      <div class="border-t border-zinc-100">
-        <p class="mx-auto max-w-6xl px-6 py-5 text-xs text-zinc-400">
+      <div class="border-t border-white/[0.04]">
+        <p class="mx-auto max-w-6xl px-6 py-5 text-xs text-zinc-600">
           © 2026 Ledger. A demo interface — no real accounts are connected.
         </p>
       </div>
